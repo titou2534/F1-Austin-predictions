@@ -1,0 +1,24 @@
+round,race,circuit,date,time
+1,Australian Grand Prix,albert_park,2026-03-08,04:00:00Z
+2,Chinese Grand Prix,shanghai,2026-03-15,07:00:00Z
+3,Japanese Grand Prix,suzuka,2026-03-29,05:00:00Z
+4,Miami Grand Prix,miami,2026-05-03,20:00:00Z
+5,Canadian Grand Prix,villeneuve,2026-05-24,20:00:00Z
+6,Monaco Grand Prix,monaco,2026-06-07,13:00:00Z
+7,Barcelona Grand Prix,catalunya,2026-06-14,13:00:00Z
+8,Austrian Grand Prix,red_bull_ring,2026-06-28,13:00:00Z
+9,British Grand Prix,silverstone,2026-07-05,14:00:00Z
+10,Belgian Grand Prix,spa,2026-07-19,13:00:00Z
+11,Hungarian Grand Prix,hungaroring,2026-07-26,13:00:00Z
+12,Dutch Grand Prix,zandvoort,2026-08-23,13:00:00Z
+13,Italian Grand Prix,monza,2026-09-06,13:00:00Z
+14,Spanish Grand Prix,madring,2026-09-13,13:00:00Z
+15,Azerbaijan Grand Prix,baku,2026-09-26,11:00:00Z
+16,Bahrain Grand Prix in Malaysia,sepang,2026-10-04,07:00:00Z
+17,Singapore Grand Prix,marina_bay,2026-10-11,12:00:00Z
+18,United States Grand Prix,americas,2026-10-25,20:00:00Z
+19,Mexico City Grand Prix,rodriguez,2026-11-01,20:00:00Z
+20,Brazilian Grand Prix,interlagos,2026-11-08,17:00:00Z
+21,Las Vegas Grand Prix,vegas,2026-11-22,04:00:00Z
+22,Qatar Grand Prix,losail,2026-11-29,16:00:00Z
+23,Abu Dhabi Grand Prix,yas_marina,2026-12-06,13:00:00Z
