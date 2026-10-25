@@ -16,6 +16,7 @@ The model is a gradient-boosted regressor (scikit-learn). It predicts a dry and 
 ## Data
 
 - Race results 2018–2026 from the [Jolpica / Ergast API](https://api.jolpi.ca/ergast/f1)
+- Qualifying results (the starting grid) from [OpenF1](https://openf1.org)
 - Historical race-time weather (ERA5) and the Austin forecast from [Open-Meteo](https://open-meteo.com), plus a hand-checked list of known wet and dry races
 
 ## Usage
@@ -24,8 +25,11 @@ The model is a gradient-boosted regressor (scikit-learn). It predicts a dry and 
 pip install pandas numpy scikit-learn scipy
 python3 fetch_data.py                 # refresh results + weather into data/
 python3 model.py                      # pre-qualifying prediction
-python3 model.py --grid grid.csv      # after qualifying (csv columns: code,grid)
+python3 fetch_data.py --grid          # after qualifying: latest grid into grid.csv
+python3 model.py --grid grid.csv      # post-qualifying prediction
 python3 model.py --rain 0.4           # override the rain probability
 ```
+
+`grid.csv` is the qualifying order, so edit it by hand if a driver takes a grid penalty.
 
 The output is printed to the terminal and saved to `austin_2026_prediction.csv`.

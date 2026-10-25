@@ -4,12 +4,16 @@ Writes:
   data/results.csv  - one row per driver per Grand Prix, 2018 -> latest completed 2026 race
   data/races.csv    - one row per race with circuit, date and weather flags
   data/schedule_2026.csv
+
+With --grid, only downloads the latest qualifying classification (OpenF1) and
+writes grid.csv (columns code,grid) for `model.py --grid grid.csv`.
 """
 
+import argparse
 import json
 import time
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -18,6 +22,7 @@ DATA = Path(__file__).parent / "data"
 DATA.mkdir(exist_ok=True)
 SEASONS = range(2018, 2027)
 JOLPICA = "https://api.jolpi.ca/ergast/f1"
+OPENF1 = "https://api.openf1.org/v1"
 
 # Races widely remembered as wet/mixed for a meaningful part of the GP. Used to
 # back up the reanalysis weather data, which can miss short local showers.
@@ -101,7 +106,35 @@ def race_weather(lat, lon, date, time_utc):
     return win["precipitation"].fillna(0).sum(), win["temperature_2m"].mean()
 
 
-def main():
+def fetch_grid(session_key=None):
+    """Write grid.csv from the most recent completed qualifying session on OpenF1.
+
+    Note: this is the qualifying order. Grid penalties applied afterwards are not
+    included, so edit grid.csv by hand if a driver gets one.
+    """
+    if session_key is None:
+        sessions = get_json(f"{OPENF1}/sessions?year={SEASONS[-1]}&session_name=Qualifying")
+        now = datetime.now(UTC).isoformat()
+        done = [s for s in sessions if s.get("date_end") and s["date_end"][:19] < now]
+        if not done:
+            raise RuntimeError("no completed qualifying session found on OpenF1")
+        latest = max(done, key=lambda s: s["date_start"])
+        session_key = latest["session_key"]
+        print(f"Qualifying: {latest['circuit_short_name']} {latest['date_start'][:10]} (session {session_key})")
+
+    results = get_json(f"{OPENF1}/session_result?session_key={session_key}")
+    if not results:
+        raise RuntimeError(f"no results yet for session {session_key}; try again later")
+    codes = {d["driver_number"]: d["name_acronym"]
+             for d in get_json(f"{OPENF1}/drivers?session_key={session_key}")}
+    grid = pd.DataFrame([{"code": codes[r["driver_number"]], "grid": r["position"]}
+                         for r in results if r.get("position")]).sort_values("grid")
+    out = Path(__file__).parent / "grid.csv"
+    grid.to_csv(out, index=False)
+    print(f"wrote {out.name}: " + ", ".join(f"P{g.grid} {g.code}" for g in grid.head(3).itertuples()) + ", ...")
+
+
+def fetch_all():
     results = fetch_results()
     results.to_csv(DATA / "results.csv", index=False)
 
@@ -127,6 +160,18 @@ def main():
         "round": int(s["round"]), "race": s["raceName"], "circuit": s["Circuit"]["circuitId"],
         "date": s["date"], "time": s.get("time", ""),
     } for s in sched]).to_csv(DATA / "schedule_2026.csv", index=False)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--grid", action="store_true",
+                    help="only fetch the latest qualifying result into grid.csv")
+    ap.add_argument("--session", type=int, help="OpenF1 session_key to use with --grid")
+    args = ap.parse_args()
+    if args.grid:
+        fetch_grid(args.session)
+    else:
+        fetch_all()
 
 
 if __name__ == "__main__":
